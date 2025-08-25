@@ -70,14 +70,17 @@ class CustomerListView(APIView):
 
 class VendorView(APIView):
     def post(self, request):
-        serializer = VendorSerializer(data=request.data)
-        if serializer.is_valid():
-            vendor = serializer.save()
-            return Response({
-                'status': status.HTTP_201_CREATED,
-                'message': 'Vendor registered successfully.'
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            serializer = VendorSerializer(data=request.data)
+            if serializer.is_valid():
+                vendor = serializer.save()
+                return Response({
+                    'status': status.HTTP_201_CREATED,
+                    'message': 'Vendor registered successfully.'
+                }, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class VendorListView(APIView):
     def get(self, request):
