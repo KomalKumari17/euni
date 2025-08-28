@@ -5,27 +5,20 @@ from rest_framework.response import Response
 from django.contrib.auth import login
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework import viewsets
+
 
 # Create your views here.
-class CustomerRegisterView(APIView):
-    def post(self, request):
-        serializer = CustomUserSerializer(data=request.data)
+class RegisterView(APIView):
+    def post(self, request, role=None):
+        data = request.data.copy()
+        data['role'] = role
+        serializer = RegisterSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({
                 'status': status.HTTP_201_CREATED,
                 'message': 'User registered successfully.'
-            }, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class AdminRegisterView(APIView):
-    def post(self, request):
-        serializer = AdminSerializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
-            return Response({
-                'status': status.HTTP_201_CREATED,
-                'message': 'Admin registered successfully.'
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -68,19 +61,10 @@ class CustomerListView(APIView):
         serializer = CustomUserSerializer(customers, many=True)
         return Response(serializer.data)
 
-class VendorView(APIView):
-    def post(self, request):
-        try:
-            serializer = VendorSerializer(data=request.data)
-            if serializer.is_valid():
-                vendor = serializer.save()
-                return Response({
-                    'status': status.HTTP_201_CREATED,
-                    'message': 'Vendor registered successfully.'
-                }, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e:
-            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+class VendorViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Vendor.objects.all()
+    serializer_class = VendorSerializer
 
 class VendorListView(APIView):
     def get(self, request):

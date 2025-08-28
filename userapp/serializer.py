@@ -4,21 +4,26 @@ from random import randint
 from django.contrib.auth import authenticate
 from django.db import transaction
 
-class CustomUserSerializer(serializers.ModelSerializer):
+class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ['id', 'email', 'username','password', 'role', 'is_active', 'is_staff']
+        fields = ['id','fname', 'lname', 'email', 'username','password', 'role', 'is_active', 'is_staff']
 
     def create(self, validated_data):
         email = validated_data['email']
-        validated_data['role'] = 'customer'
         validated_data['username'] = email.split('@')[0] + str(randint(1, 100))
         user = CustomUser(**validated_data)
         user.set_password(validated_data['password'])
         user.save()
         return user
+    
+class CustomUserSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = ['id','fname', 'lname', 'email', 'username','password', 'role', 'is_active', 'is_staff']
 
 class AdminSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
@@ -47,10 +52,6 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid credentials")
         return {"user": user}
 
-class CustomUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = CustomUser
-        fields = ['id', 'email', 'username', 'role', 'is_active', 'is_staff']
 
 class DepartmentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,57 +59,10 @@ class DepartmentSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'created_at', 'updated_at']
 
 class VendorSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(required=False)
-    username = serializers.CharField(required=False)
-    role = serializers.CharField(required=False)
-    is_active = serializers.BooleanField(default=True)
-    department = serializers.CharField(required=False)
-    profile_picture = serializers.ImageField(required=False, allow_null=True)
     class Meta:
         model = Vendor
-        fields = ['id', 'email', 'username', 'password', 'role', 'is_active', 'department', 'profession', 'phone_number', 'available', 'bio', 'experience_years', 'hourly_rate', 'profile_picture']
+        fields = ['id', 'user', 'name','profession', 'profile_picture', 'phone_number', 'experience_years', 'hourly_rate','bio', 'hourly_rate', 'available','department', 'created_at', 'updated_at']
 
-    def create(self, validated_data):
-        try:
-            with transaction.atomic():
-                email = validated_data.pop('email', None)
-                role = validated_data.pop('role', 'vendor')
-                department = validated_data.pop('department', None)
-                profession = validated_data.pop('profession', None)
-                phone_number = validated_data.pop('phone_number', None)
-                available = validated_data.pop('available', None)
-                bio = validated_data.pop('bio', None)
-                profile_picture = validated_data.pop('profile_picture', None)
-                experience_years = validated_data.pop('experience_years', None)
-                hourly_rate = validated_data.pop('hourly_rate', None)
-                username = email.split('@')[0] + str(randint(1, 100))
-                role = 'vendor'
-                user = CustomUser(email=email, username=username, role=role, **validated_data)
-                user.set_password(validated_data['password'])
-                user.save()
-                if department:
-                    try:
-                        department = Department.objects.get(name=department)
-                    except Department.DoesNotExist:
-                        department = Department.objects.create(name=department)
-
-                vendor = Vendor(
-                    user=user,
-                    department=department,
-                    profession=profession,
-                    phone_number=phone_number,
-                    available=available,
-                    bio=bio,
-                    profile_picture=profile_picture,
-                    experience_years=experience_years,
-                    hourly_rate=hourly_rate
-                )
-                vendor.save()
-            return vendor
-        except Exception as e:
-            raise serializers.ValidationError({"error": str(e)})
-        
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['user'] = {

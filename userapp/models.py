@@ -20,20 +20,23 @@ class CustomUserManager(BaseUserManager):
 
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
-        ('vendor', 'Vendor'),
+        ('professional', 'Professional'),
         ('customer', 'Customer'),
+        ('assistant', 'Assistant'),
         ('admin', 'Admin'),
     )
 
+    fname = models.CharField(max_length=30)
+    lname = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=30, unique=True, null=True, blank=True)
-    role = models.CharField(max_length=255, choices=ROLE_CHOICES, null=True, blank=True)
+    role = models.CharField(max_length=255, choices=ROLE_CHOICES)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username', 'fname', 'lname']
 
     objects = CustomUserManager()
 
