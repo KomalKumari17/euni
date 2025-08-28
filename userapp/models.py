@@ -58,12 +58,12 @@ class Department(models.Model):
     class Meta:
         ordering = ['-id']
 
-class Vendor(models.Model):
+class Professional(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     profession = models.CharField(max_length=100)
-    profile_picture = models.ImageField(upload_to='vendor_profiles/', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='professional_profiles/', null=True, blank=True)
     phone_number = models.CharField(max_length=15)
     bio = models.TextField(blank=True)
     experience_years = models.IntegerField(default=0)
@@ -79,7 +79,7 @@ class Vendor(models.Model):
         ordering = ['-id']
 
 class Review(models.Model):
-    vendor = models.ForeignKey(Vendor, on_delete=models.CASCADE, related_name='reviews')
+    professional = models.ForeignKey(Professional, on_delete=models.CASCADE, related_name='reviews')
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='given_reviews')
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]
@@ -90,7 +90,7 @@ class Review(models.Model):
 
     class Meta:
         ordering = ['-id']
-        unique_together = ('vendor', 'customer')
+        unique_together = ('professional', 'customer')
 
     def __str__(self):
         return f"Review by {self.customer.username} for {self.vendor.name}"

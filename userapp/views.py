@@ -61,16 +61,16 @@ class CustomerListView(APIView):
         serializer = CustomUserSerializer(customers, many=True)
         return Response(serializer.data)
 
-class VendorViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
-    queryset = Vendor.objects.all()
-    serializer_class = VendorSerializer
-
-class VendorListView(APIView):
+class AssistantListView(APIView):
     def get(self, request):
-        vendors = Vendor.objects.all()
-        serializer = VendorSerializer(vendors, many=True)
+        assistants = CustomUser.objects.filter(role='assistant')
+        serializer = CustomUserSerializer(assistants, many=True)
         return Response(serializer.data)
+
+class ProfessionalViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAuthenticated]
+    queryset = Professional.objects.all()
+    serializer_class = ProfessionalsSerializer
 
 class DepartmentListView(APIView):
     def get(self, request):

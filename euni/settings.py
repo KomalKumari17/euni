@@ -69,6 +69,13 @@ REST_FRAMEWORK = {
     ),
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=365 * 100),  
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=365 * 100),  
+    "BLACKLIST_AFTER_ROTATION": True, 
+    "ROTATE_REFRESH_TOKENS": True,
+}
+
 
 ROOT_URLCONF = 'euni.urls'
 

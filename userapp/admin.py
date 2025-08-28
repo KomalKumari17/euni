@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CustomUser, Vendor, Department, Review
+from .models import CustomUser, Professional, Department, Review
 
 
 # Register your models here.
@@ -17,8 +17,8 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'updated_at')
 
 
-@admin.register(Vendor)
-class VendorAdmin(admin.ModelAdmin):
+@admin.register(Professional)
+class ProfessionalAdmin(admin.ModelAdmin):
     list_display = ('user', 'department', 'profession', 'phone_number', 'available')
     search_fields = ('user__email', 'user__username', 'department__name', 'profession')
     list_filter = ('department', 'available')
@@ -26,6 +26,6 @@ class VendorAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('vendor', 'customer', 'rating', 'created_at')
-    search_fields = ('vendor__user__email', 'customer__email')
+    list_display = ('professional', 'customer', 'rating', 'created_at')
+    search_fields = ('professional__user__email', 'customer__email')
     list_filter = ('rating', 'created_at')
