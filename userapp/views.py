@@ -15,9 +15,14 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
+            refresh = RefreshToken.for_user(user)
             return Response({
                 'status': status.HTTP_201_CREATED,
-                'message': 'User registered successfully.'
+                'message': 'User registered successfully.',
+                'tokens': {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token)
+                }
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -48,6 +53,7 @@ class UserInfoView(APIView):
         return Response(serializer.data)
 
 class UserListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         users = CustomUser.objects.filter(is_superuser=False)
         serializer = CustomUserSerializer(users, many=True)
@@ -55,12 +61,14 @@ class UserListView(APIView):
     
 
 class CustomerListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         customers = CustomUser.objects.filter(role='customer')
         serializer = CustomUserSerializer(customers, many=True)
         return Response(serializer.data)
 
 class AssistantListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         assistants = CustomUser.objects.filter(role='assistant')
         serializer = CustomUserSerializer(assistants, many=True)
@@ -72,6 +80,7 @@ class ProfessionalViewSet(viewsets.ModelViewSet):
     serializer_class = ProfessionalsSerializer
 
 class DepartmentListView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request):
         departments = Department.objects.all()
         serializer = DepartmentSerializer(departments, many=True)
