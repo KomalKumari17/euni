@@ -10,30 +10,27 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id','fname', 'lname', 'email', 'username','password', 'confirm_password', 'role', 'is_active', 'is_staff']
+        fields = ['id','fname', 'lname', 'email', 'username','password', 'confirm_password', 'role', 'agreeToTerms', 'is_active', 'is_staff']
 
     def create(self, validated_data):
-        try:
-            with transaction.atomic():
-                email = validated_data['email']
-                if validated_data['password'] != validated_data['confirm_password']:
-                    raise serializers.ValidationError({"confirm_password": "Passwords do not match"})
-                validated_data.pop('confirm_password')
-                validated_data['username'] = email.split('@')[0] + str(randint(1, 100))
-                user = CustomUser(**validated_data)
-                user.set_password(validated_data['password'])
-                user.save()
-                if validated_data['role'] == 'professional':
-                    Professional.objects.create(user=user)
-                return user
-        except Exception as e:
-            raise serializers.ValidationError({"error": str(e)})
+        with transaction.atomic():
+            email = validated_data['email']
+            if validated_data['password'] != validated_data['confirm_password']:
+                raise serializers.ValidationError({"confirm_password": ["Passwords do not match"]})
+            validated_data.pop('confirm_password')
+            validated_data['username'] = email.split('@')[0] + str(randint(1, 100))
+            user = CustomUser(**validated_data)
+            user.set_password(validated_data['password'])
+            user.save()
+            if validated_data['role'] == 'professional':
+                Professional.objects.create(user=user)
+            return user
 
 class CustomUserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id','fname', 'lname', 'email', 'username', 'role', 'is_active', 'is_staff']
+        fields = ['id','fname', 'lname', 'email', 'username', 'role', 'agreeToTerms', 'is_active', 'is_staff']
 
 class AdminSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)

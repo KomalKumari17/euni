@@ -10,7 +10,7 @@ urlpatterns = [
     path("", include(router.urls)),
     path('login/', LoginView.as_view(), name='login'),
     path('user-info/', UserInfoView.as_view(), name='user-info'),
-    path('register/<str:role>/', RegisterView.as_view(), name='register'),
+    path('register/', RegisterView.as_view(), name='register'),
     path('users/', UserListView.as_view(), name='user-list'),
     path('customers/', CustomerListView.as_view(), name='customer-list'),
     path('assistants/', AssistantListView.as_view(), name='assistant-list'),

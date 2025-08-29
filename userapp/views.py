@@ -10,9 +10,8 @@ from rest_framework import viewsets
 
 # Create your views here.
 class RegisterView(APIView):
-    def post(self, request, role=None):
+    def post(self, request):
         data = request.data.copy()
-        data['role'] = role
         serializer = RegisterSerializer(data=data)
         if serializer.is_valid():
             user = serializer.save()
