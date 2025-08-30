@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import CustomUser, Professional, Department, Review
+from .models import CustomUser, UserProfile, Department, Review
 
 
 # Register your models here.
 @admin.register(CustomUser)
 class CustomUserAdmin(admin.ModelAdmin):
-    list_display = ('email', 'username', 'role', 'is_active', 'is_staff')
+    list_display = ('email', 'username', 'role', 'phone_number', 'is_active', 'is_staff')
     search_fields = ('email', 'username')
     list_filter = ('role', 'is_active', 'is_staff')
 
@@ -17,9 +17,9 @@ class DepartmentAdmin(admin.ModelAdmin):
     list_filter = ('created_at', 'updated_at')
 
 
-@admin.register(Professional)
-class ProfessionalAdmin(admin.ModelAdmin):
-    list_display = ('user', 'department', 'profession', 'phone_number', 'available')
+@admin.register(UserProfile)
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'department', 'profession', 'available')
     search_fields = ('user__email', 'user__username', 'department__name', 'profession')
     list_filter = ('department', 'available')
 

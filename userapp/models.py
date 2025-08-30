@@ -29,6 +29,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     fname = models.CharField(max_length=30)
     lname = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=15)
     username = models.CharField(max_length=30, unique=True, null=True, blank=True)
     role = models.CharField(max_length=255, choices=ROLE_CHOICES)
     agreeToTerms = models.BooleanField(default=False)
@@ -61,13 +62,11 @@ class Department(models.Model):
     class Meta:
         ordering = ['-id']
 
-class Professional(models.Model):
+class UserProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     profession = models.CharField(max_length=100)
     profile_picture = models.ImageField(upload_to='professional_profiles/', null=True, blank=True)
-    phone_number = models.CharField(max_length=15)
     bio = models.TextField(blank=True)
     experience_years = models.IntegerField(default=0)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -82,7 +81,7 @@ class Professional(models.Model):
         ordering = ['-id']
 
 class Review(models.Model):
-    professional = models.ForeignKey(Professional, on_delete=models.CASCADE, related_name='reviews')
+    professional = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='reviews')
     customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='given_reviews')
     rating = models.IntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)]

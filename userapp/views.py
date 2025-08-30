@@ -19,9 +19,7 @@ class RegisterView(APIView):
             return Response({
                 'status': status.HTTP_201_CREATED,
                 'message': 'User registered successfully.',
-                'tokens': {
-                    'access': str(refresh.access_token)
-                }
+                'token': str(refresh.access_token)
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -76,10 +74,25 @@ class AssistantListView(APIView):
         serializer = CustomUserSerializer(assistants, many=True)
         return Response(serializer.data)
 
-class ProfessionalViewSet(viewsets.ModelViewSet):
+class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = Professional.objects.all()
-    serializer_class = ProfessionalsSerializer
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+
+    def partial_update(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            if instance.user:
+                user_serializer = CustomUserSerializer(instance.user, data=request.data, partial=True)
+                user_serializer.is_valid(raise_exception=True)
+                user_serializer.save()
+
+            serializers = self.get_serializer(instance, data=request.data, partial=True)
+            serializers.is_valid(raise_exception=True)
+            self.perform_update(serializers)
+            return Response(serializers.data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 class DepartmentListView(APIView):
     permission_classes = [IsAuthenticated]
