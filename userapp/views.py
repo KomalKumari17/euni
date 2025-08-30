@@ -20,7 +20,6 @@ class RegisterView(APIView):
                 'status': status.HTTP_201_CREATED,
                 'message': 'User registered successfully.',
                 'tokens': {
-                    'refresh': str(refresh),
                     'access': str(refresh.access_token)
                 }
             }, status=status.HTTP_201_CREATED)
@@ -36,11 +35,13 @@ class LoginView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                 "message": "Login successful",
-                "full name": user.fname + " " + user.lname,
-                "email": user.email,
-                "role": user.role,
+                "user": {
+                    "id": user.id,
+                    "full name": user.fname + " " + user.lname,
+                    "email": user.email,
+                    "role": user.role,
+                },
                 "tokens": {
-                    "refresh": str(refresh),
                     "access": str(refresh.access_token)
                 }
             }, status=status.HTTP_200_OK)
