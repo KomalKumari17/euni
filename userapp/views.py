@@ -6,7 +6,7 @@ from django.contrib.auth import login
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets
-
+from rest_framework.decorators import action
 
 # Create your views here.
 class RegisterView(APIView):
@@ -79,20 +79,26 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
-    def partial_update(self, request, *args, **kwargs):
+    @action(detail=False, methods=['get', 'patch'], url_path='me')
+    def update_profile(self, request, *args, **kwargs):
         try:
-            instance = self.get_object()
-            if instance.user:
+            if request.method == 'GET':
+                instance = request.user.profile
+                serializer = self.get_serializer(instance)
+                return Response(serializer.data)
+            if request.method == 'PATCH':
+                instance = request.user.profile
                 user_serializer = CustomUserSerializer(instance.user, data=request.data, partial=True)
                 user_serializer.is_valid(raise_exception=True)
                 user_serializer.save()
 
-            serializers = self.get_serializer(instance, data=request.data, partial=True)
-            serializers.is_valid(raise_exception=True)
-            self.perform_update(serializers)
-            return Response(serializers.data)
+                serializers = self.get_serializer(instance, data=request.data, partial=True)
+                serializers.is_valid(raise_exception=True)
+                self.perform_update(serializers)
+                return Response(serializers.data)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class DepartmentListView(APIView):
     permission_classes = [IsAuthenticated]

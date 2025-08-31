@@ -68,6 +68,16 @@ class UserProfileSerializer(serializers.ModelSerializer):
         }
         rep['department'] = instance.department.name if instance.department else None
         return rep
+    
+    def update(self, instance, validated_data):
+        # Update user fields
+        user_fields = ['fname', 'lname', 'phone_number']
+        for field in user_fields:
+            if field in validated_data:
+                setattr(instance.user, field, validated_data.pop(field))
+        instance.user.save()
+        # Update profile fields
+        return super().update(instance, validated_data)
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:

@@ -63,7 +63,7 @@ class Department(models.Model):
         ordering = ['-id']
 
 class UserProfile(models.Model):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='profile')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     profession = models.CharField(max_length=100)
     profile_picture = models.ImageField(upload_to='professional_profiles/', null=True, blank=True)
