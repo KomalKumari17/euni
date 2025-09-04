@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-bi8eqa58(s9v-!b*bibh0-0_6#@$1po)$h+ke-6va)yr^&+zx_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['api.euni.online', '157.173.221.192']
 
 
 # Application definition
