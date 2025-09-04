@@ -81,7 +81,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
-    @action(detail=False, methods=['get', 'patch'], url_path='me')
+    @action(detail=False, methods=['get', 'patch'], url_path='profile')
     def update_profile(self, request, *args, **kwargs):
         try:
             if request.method == 'GET':

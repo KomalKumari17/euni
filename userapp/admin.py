@@ -19,8 +19,8 @@ class DepartmentAdmin(admin.ModelAdmin):
 
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'department', 'profession', 'available')
-    search_fields = ('user__email', 'user__username', 'department__name', 'profession')
+    list_display = ('user', 'department', 'professional_description', 'available')
+    search_fields = ('user__email', 'user__username', 'department__name', 'professional_description')
     list_filter = ('department', 'available')
 
 

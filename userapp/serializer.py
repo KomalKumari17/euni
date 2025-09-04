@@ -52,13 +52,14 @@ class DepartmentSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'user','profession', 'profile_picture', 'experience_years', 'hourly_rate','bio', 'hourly_rate', 'available','department', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'alt_phone_number', 'professional_description', 'profile_picture', 'experience_years', 'hourly_rate','bio', 'hourly_rate', 'available','department','service_area', 'city', 'pincode', 'skills', 'created_at', 'updated_at']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['user'] = {
             'id': instance.user.id,
-            'full name': instance.user.fname + " " + instance.user.lname,
+            'fname': instance.user.fname,
+            'lname': instance.user.lname,
             'phone number': instance.user.phone_number,
             'email': instance.user.email,
             'username': instance.user.username,
