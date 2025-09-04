@@ -60,7 +60,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'id': instance.user.id,
             'fname': instance.user.fname,
             'lname': instance.user.lname,
-            'phone number': instance.user.phone_number,
+            'phone_number': instance.user.phone_number,
             'email': instance.user.email,
             'username': instance.user.username,
             'role': instance.user.role,
