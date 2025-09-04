@@ -27,7 +27,12 @@ SECRET_KEY = 'django-insecure-bi8eqa58(s9v-!b*bibh0-0_6#@$1po)$h+ke-6va)yr^&+zx_
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['api.euni.online', '157.173.221.192']
+ALLOWED_HOSTS = [
+    'api.euni.online', 
+    '157.173.221.192',
+    'localhost',
+    '127.0.0.1'
+    ]
 
 
 # Application definition
@@ -63,8 +68,10 @@ CORS_ALLOWED_ORIGINS = [
      "http://127.0.0.1:5173",
      "http://localhost:8000",
      "http://127.0.0.1:8000",
-      "http://localhost:8005",
+     "http://localhost:8005",
      "http://127.0.0.1:8005",
+     "https://www.euni.online",
+     "https://api.euni.online"
  ]
 
 CSRF_TRUSTED_ORIGINS = [
@@ -74,6 +81,8 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8005",
     "http://127.0.0.1:8005",
+    "https://www.euni.online",
+    "https://api.euni.online"
 ]
 
 SIMPLE_JWT = {
