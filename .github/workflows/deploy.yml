@@ -12,22 +12,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Copy SSH key
-        uses: webfactory/ssh-agent@v0.9.0
+      - name: Set up Python
+        uses: actions/setup-python@v5
         with:
-          ssh-private-key: ${{ secrets.VPS_KEY }}
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Deploy to VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no root@157.173.221.192 << 'ENDSSH'
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          script: |
             cd /home/ubuntu/euni/
-            git fetch origin main
-            git reset --hard origin/main
+            git pull origin main
             source venv/bin/activate
             pip install -r requirements.txt
-            python manage.py makemigrations --noinput
-            python manage.py migrate --noinput
+            python manage.py migrate
             python manage.py collectstatic --noinput
-            systemctl restart gunicorn-euni
-            systemctl restart nginx
-          ENDSSH
+            sudo systemctl restart gunicorn-euni
+            sudo systemctl restart nginx
