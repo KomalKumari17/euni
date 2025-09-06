@@ -19,7 +19,7 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh -o StrictHostKeyChecking=no ssh root@157.173.221.192 << 'ENDSSH'
+          ssh -o StrictHostKeyChecking=no root@157.173.221.192 << 'ENDSSH'
             cd /home/ubuntu/euni/
             git fetch origin main
             git reset --hard origin/main
