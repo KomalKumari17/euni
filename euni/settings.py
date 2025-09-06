@@ -74,6 +74,7 @@ CORS_ALLOWED_ORIGINS = [
      "https://api.euni.online"
  ]
 
+
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -82,7 +83,6 @@ CSRF_TRUSTED_ORIGINS = [
     "https://www.euni.online",
     "https://api.euni.online"
 ]
-
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365*100),
