@@ -19,16 +19,15 @@ jobs:
 
       - name: Deploy to VPS
         run: |
-          ssh -o StrictHostKeyChecking=no root@157.173.221.192 << 'ENDSSH'
-            cd /opt/api.okpuja.com
+          ssh -o StrictHostKeyChecking=no ssh root@157.173.221.192 << 'ENDSSH'
+            cd /home/ubuntu/euni/
             git fetch origin main
-            git reset --hard origin/main  # Always use repo HEAD, discard local changes
+            git reset --hard origin/main
             source venv/bin/activate
             pip install -r requirements.txt
             python manage.py makemigrations --noinput
             python manage.py migrate --noinput
             python manage.py collectstatic --noinput
-            systemctl restart nginx
             systemctl restart gunicorn-euni
-            sudo systemctl restart nginx
+            systemctl restart nginx
           ENDSSH
