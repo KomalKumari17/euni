@@ -70,8 +70,6 @@ CORS_ALLOWED_ORIGINS = [
      "http://127.0.0.1:5173",
      "http://localhost:8000",
      "http://127.0.0.1:8000",
-     "http://localhost:8005",
-     "http://127.0.0.1:8005",
      "https://www.euni.online",
      "https://api.euni.online"
  ]
@@ -81,11 +79,10 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://localhost:8005",
-    "http://127.0.0.1:8005",
     "https://www.euni.online",
     "https://api.euni.online"
 ]
+
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365*100),
