@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
+    'dbbackup',
+
 ]
 
 MIDDLEWARE = [
@@ -99,7 +101,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
-
 
 ROOT_URLCONF = 'euni.urls'
 
@@ -180,3 +181,15 @@ AUTH_USER_MODEL = 'userapp.CustomUser'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+STORAGES = {
+    'staticfiles': {
+        'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+    },
+    'dbbackup': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'OPTIONS': {
+            'location': 'staticfiles/backup/',
+        },
+    },
+}
