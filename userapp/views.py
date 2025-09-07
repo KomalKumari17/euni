@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import ListAPIView
+
 
 # Create your views here.
 class RegisterView(APIView):
@@ -23,6 +25,7 @@ class RegisterView(APIView):
                 'token': str(refresh.access_token)
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
@@ -46,6 +49,7 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserInfoView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -54,27 +58,13 @@ class UserInfoView(APIView):
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
 
-class UserListView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        users = CustomUser.objects.filter(is_superuser=False)
-        serializer = CustomUserSerializer(users, many=True)
-        return Response(serializer.data)
-    
 
-class CustomerListView(APIView):
+class UserListView(ListAPIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request):
-        customers = CustomUser.objects.filter(role='customer')
-        serializer = CustomUserSerializer(customers, many=True)
-        return Response(serializer.data)
+    filterset_fields = ['role', 'phone_number']
+    queryset = CustomUser.objects.filter(is_superuser=False)
+    serializer_class = CustomUserSerializer
 
-class AssistantListView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        assistants = CustomUser.objects.filter(role='assistant')
-        serializer = CustomUserSerializer(assistants, many=True)
-        return Response(serializer.data)
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
