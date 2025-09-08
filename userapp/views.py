@@ -68,7 +68,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     queryset = UserProfile.objects.filter(user__is_superuser=False).exclude(user__role='customer')
     serializer_class = UserProfileSerializer
     filterset_fields = ['department', 'user__role', 'service_area', 'city', 'available']
-    search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city']
+    search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city', 'experience_years', 'hourly_rate']
 
     @action(detail=False, methods=['get', 'patch'], url_path='profile')
     def update_profile(self, request, *args, **kwargs):
