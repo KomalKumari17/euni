@@ -12,3 +12,4 @@ db.sqlite3
 
 # Ignore virtual environment
 \venv
+\media
