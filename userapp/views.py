@@ -70,7 +70,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     filterset_fields = ['department', 'user__role', 'service_area', 'city', 'available']
     search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city', 'experience_years', 'hourly_rate']
 
-    @action(detail=False, methods=['get', 'patch'], url_path='profile')
+    @action(detail=False, methods=['get', 'patch'], url_path='self/profile')
     def update_profile(self, request, *args, **kwargs):
         try:
             if request.method == 'GET':
