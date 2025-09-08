@@ -26,13 +26,6 @@ class RegisterSerializer(serializers.ModelSerializer):
                 UserProfile.objects.create(user=user)
             return user
 
-class CustomUserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = CustomUser
-        fields = ['id','fname', 'lname', 'email', 'username','phone_number','role', 'agreeToTerms', 'is_active', 'is_staff']
-
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
     password = serializers.CharField(write_only=True)
@@ -79,6 +72,14 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.user.save()
         # Update profile fields
         return super().update(instance, validated_data)
+    
+    
+class CustomUserSerializer(serializers.ModelSerializer):
+    profile = UserProfileSerializer(read_only=True)
+    class Meta:
+        model = CustomUser
+        fields = ['id','fname', 'lname', 'email', 'username','phone_number','role', 'agreeToTerms', 'is_active', 'is_staff', 'profile']
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
