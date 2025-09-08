@@ -55,8 +55,7 @@ class UserInfoView(APIView):
         user = request.user
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
-
-
+    
 class UserListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     filterset_fields = ['role', 'phone_number']
@@ -66,8 +65,10 @@ class UserListView(ListAPIView):
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = UserProfile.objects.all()
+    queryset = UserProfile.objects.filter(user__is_superuser=False).exclude(user__role='customer')
     serializer_class = UserProfileSerializer
+    filterset_fields = ['department', 'user__role', 'service_area', 'city', 'available']
+    search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city']
 
     @action(detail=False, methods=['get', 'patch'], url_path='profile')
     def update_profile(self, request, *args, **kwargs):

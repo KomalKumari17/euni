@@ -73,12 +73,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
         # Update profile fields
         return super().update(instance, validated_data)
     
-    
+
 class CustomUserSerializer(serializers.ModelSerializer):
-    profile = UserProfileSerializer(read_only=True)
     class Meta:
         model = CustomUser
-        fields = ['id','fname', 'lname', 'email', 'username','phone_number','role', 'agreeToTerms', 'is_active', 'is_staff', 'profile']
+        fields = ['id','fname', 'lname', 'email', 'username','phone_number','role', 'agreeToTerms', 'is_active', 'is_staff']
 
 
 class ReviewSerializer(serializers.ModelSerializer):
