@@ -69,14 +69,6 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             "message": "Department deleted successfully"
             }, status=status.HTTP_200_OK)
 
-class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = UserProfile.objects.all()
-    serializer_class = UserProfileSerializer
-    permission_classes = [IsAuthenticated]
-    filterset_fields = ['department', 'user__role', 'service_area', 'city', 'available']
-    search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city', 'experience_years', 'hourly_rate']
-
-
 class CountUsersByRoleView(APIView):
     permission_classes = [IsAuthenticated]
 
