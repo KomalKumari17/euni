@@ -33,6 +33,8 @@ class LoginView(APIView):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
+            if not user.is_active:
+                return Response({"error": "your account is disabled."}, status=status.HTTP_403_FORBIDDEN)
             login(request, user)
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -59,13 +61,13 @@ class UserInfoView(APIView):
 class UserListView(ListAPIView):
     permission_classes = [IsAuthenticated]
     filterset_fields = ['role', 'phone_number']
-    queryset = CustomUser.objects.filter(is_superuser=False)
+    queryset = CustomUser.objects.filter(is_superuser=False, is_active=True)
     serializer_class = CustomUserSerializer
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = UserProfile.objects.filter(user__is_superuser=False).exclude(user__role='customer')
+    queryset = UserProfile.objects.filter(user__is_superuser=False, user__is_active=True).exclude(user__role='customer')
     serializer_class = UserProfileSerializer
     filterset_fields = ['department', 'user__role', 'service_area', 'city', 'available']
     search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city', 'experience_years', 'hourly_rate']

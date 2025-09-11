@@ -99,6 +99,15 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend',
                                     'rest_framework.filters.SearchFilter',],
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'userapp.throttles.UserRateThrottle',
+        'userapp.throttles.IPRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user_throttle': '5/minute',
+        'ip_throttle': '3/minute',
+    },
 }
 
 ROOT_URLCONF = 'euni.urls'

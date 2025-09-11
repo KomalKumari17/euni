@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['id','fname', 'lname', 'email', 'username','password', 'confirm_password', 'role', 'agreeToTerms', 'is_active', 'is_staff', 'created_at', 'updated_at']
+        fields = ['id','fname', 'lname', 'email', 'username','password', 'confirm_password', 'role', 'agreeToTerms', 'is_active', 'is_staff', 'is_freetrial', 'joined_at', 'updated_at']
 
     def create(self, validated_data):
         with transaction.atomic():
@@ -77,7 +77,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class CustomUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['id','fname', 'lname', 'email', 'username','phone_number','role', 'agreeToTerms', 'is_active', 'is_staff']
+        fields = ['id','fname', 'lname', 'email', 'username','phone_number','role', 'agreeToTerms', 'is_active', 'is_staff', 'is_freetrial', 'joined_at', 'updated_at']
 
 
 class ReviewSerializer(serializers.ModelSerializer):

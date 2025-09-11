@@ -36,13 +36,24 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_freetrial = models.BooleanField(default=True)
+    joined_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'fname', 'lname']
 
     objects = CustomUserManager()
+
+    def save(self, *args, **kwargs):
+        if self.is_freetrial and self.joined_at:
+            from django.utils import timezone
+            from datetime import timedelta
+            if timezone.now() > self.joined_at + timedelta(days=30):
+                self.is_freetrial = False
+                self.is_active = False
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.username
