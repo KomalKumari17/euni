@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework_simplejwt.token_blacklist',
     'dbbackup',
+    'django_filters',
 
 ]
 
@@ -74,7 +75,6 @@ CORS_ALLOWED_ORIGINS = [
      "https://api.euni.online"
  ]
 
-
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -87,9 +87,9 @@ CSRF_TRUSTED_ORIGINS = [
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=365*100),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=365*100),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer',),
+#     'ROTATE_REFRESH_TOKENS': True,
+#     'BLACKLIST_AFTER_ROTATION': True,
+#     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
 # Rest Framework settings
@@ -97,6 +97,17 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend',
+                                    'rest_framework.filters.SearchFilter',],
+
+    'DEFAULT_THROTTLE_CLASSES': [
+        'userapp.throttles.UserRateThrottle',
+        'userapp.throttles.IPRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'user_throttle': '5/minute',
+        'ip_throttle': '3/minute',
+    },
 }
 
 ROOT_URLCONF = 'euni.urls'
@@ -180,6 +191,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'OPTIONS': {
+            'location': MEDIA_ROOT,
+        },
+    },
     'staticfiles': {
         'BACKEND': 'django.contrib.staticfiles.storage.StaticFilesStorage',
     },

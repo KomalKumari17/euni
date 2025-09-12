@@ -29,20 +29,31 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     fname = models.CharField(max_length=30)
     lname = models.CharField(max_length=30)
     email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=15)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
     username = models.CharField(max_length=30, unique=True, null=True, blank=True)
     role = models.CharField(max_length=255, choices=ROLE_CHOICES)
     agreeToTerms = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_freetrial = models.BooleanField(default=True)
+    joined_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'fname', 'lname']
 
     objects = CustomUserManager()
+
+    def save(self, *args, **kwargs):
+        if self.is_freetrial and self.joined_at:
+            from django.utils import timezone
+            from datetime import timedelta
+            if timezone.now() > self.joined_at + timedelta(days=30):
+                self.is_freetrial = False
+                self.is_active = False
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return self.username
@@ -67,14 +78,14 @@ class UserProfile(models.Model):
     alt_phone_number = models.CharField(max_length=15, null=True, blank=True)
     department = models.ForeignKey(Department, on_delete=models.CASCADE, null=True, blank=True)
     profile_picture = models.ImageField(upload_to='professional_profiles/', null=True, blank=True)
-    bio = models.TextField(blank=True)
+    bio = models.TextField(null=True, blank=True)
     experience_years = models.IntegerField(default=0)
     hourly_rate = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     available = models.BooleanField(default=True)
     service_area = models.CharField(max_length=255, null=True, blank=True)
     city = models.CharField(max_length=100, null=True, blank=True)
     pincode = models.CharField(max_length=10, null=True, blank=True)
-    professional_description = models.CharField(max_length=100)
+    professional_description = models.CharField(max_length=100, null=True, blank=True)
     skills = models.JSONField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

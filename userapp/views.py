@@ -8,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets
 from rest_framework.decorators import action
 from rest_framework.authtoken.models import Token
+from rest_framework.generics import ListAPIView
+
 
 # Create your views here.
 class RegisterView(APIView):
@@ -24,12 +26,15 @@ class RegisterView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class LoginView(APIView):
     permission_classes = [AllowAny]
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data['user']
+            if not user.is_active:
+                return Response({"error": "your account is disabled."}, status=status.HTTP_403_FORBIDDEN)
             login(request, user)
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -40,11 +45,10 @@ class LoginView(APIView):
                     "email": user.email,
                     "role": user.role,
                 },
-                "token": str(refresh.access_token),
-                "refresh": str(refresh)
-
+                "token": str(refresh.access_token)
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserInfoView(APIView):
     permission_classes = [IsAuthenticated]
@@ -53,35 +57,22 @@ class UserInfoView(APIView):
         user = request.user
         serializer = CustomUserSerializer(user)
         return Response(serializer.data)
-
-class UserListView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        users = CustomUser.objects.filter(is_superuser=False)
-        serializer = CustomUserSerializer(users, many=True)
-        return Response(serializer.data)
     
-
-class CustomerListView(APIView):
+class UserListView(ListAPIView):
     permission_classes = [IsAuthenticated]
-    def get(self, request):
-        customers = CustomUser.objects.filter(role='customer')
-        serializer = CustomUserSerializer(customers, many=True)
-        return Response(serializer.data)
+    filterset_fields = ['role', 'phone_number']
+    queryset = CustomUser.objects.filter(is_superuser=False, is_active=True)
+    serializer_class = CustomUserSerializer
 
-class AssistantListView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
-        assistants = CustomUser.objects.filter(role='assistant')
-        serializer = CustomUserSerializer(assistants, many=True)
-        return Response(serializer.data)
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
-    queryset = UserProfile.objects.all()
+    queryset = UserProfile.objects.filter(user__is_superuser=False, user__is_active=True).exclude(user__role='customer')
     serializer_class = UserProfileSerializer
+    filterset_fields = ['department', 'user__role', 'service_area', 'city', 'available']
+    search_fields = ['user__fname', 'user__lname', 'user__email', 'pincode', 'service_area', 'city', 'experience_years', 'hourly_rate']
 
-    @action(detail=False, methods=['get', 'patch'], url_path='profile')
+    @action(detail=False, methods=['get', 'patch'], url_path='self/profile')
     def update_profile(self, request, *args, **kwargs):
         try:
             if request.method == 'GET':
