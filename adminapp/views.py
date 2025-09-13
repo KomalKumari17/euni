@@ -34,6 +34,7 @@ class UserViewSet(viewsets.ModelViewSet):
             }, status=status.HTTP_200_OK)
     
     def perform_destroy(self, instance):
+        instance.delete()
         return Response({
             "status": status.HTTP_200_OK,
             "message": "User deleted successfully"
@@ -68,6 +69,7 @@ class DepartmentViewSet(viewsets.ModelViewSet):
             "status": status.HTTP_200_OK,
             "message": "Department deleted successfully"
             }, status=status.HTTP_200_OK)
+    
 
 class CountUsersByRoleView(APIView):
     permission_classes = [IsAuthenticated]
