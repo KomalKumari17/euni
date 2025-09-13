@@ -35,8 +35,8 @@ jobs:
             pip install -r requirements.txt
             python manage.py makemigrations --noinput
             python manage.py migrate --noinput
-            python manage.py seed_admin --noinput
-            python manage.py seed_dept --noinput
+            python manage.py seed_admin
+            python manage.py seed_dept
             python manage.py collectstatic --noinput
             sudo systemctl restart gunicorn-euni
             sudo systemctl restart nginx
