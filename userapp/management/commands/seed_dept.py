@@ -9,7 +9,7 @@ class Command(BaseCommand):
             {'name': 'Electrician'},
             {'name': 'Carpenter'},
             {'name': 'Painter'},
-            {'name': 'Designer'},
+            {'name': 'Plumber'},
         ]
 
         for department_data in departments:
