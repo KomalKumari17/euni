@@ -57,6 +57,7 @@ class CreatePaymentView(APIView):
             'message': 'Payment initiated successfully.',
             'data': serializer.data,
             'payment_link': result.get('payment_link'),
+            'result': result
         }, status=status.HTTP_201_CREATED)
     
 
