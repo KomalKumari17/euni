@@ -17,7 +17,6 @@ class CreatePaymentView(APIView):
         user = request.user
         amount = request.data.get('amount')
         order_id = f"ORDER{user.id}{int(time())}"
-        print(settings.CASHFREE_APP_ID, settings.CASHFREE_SECRET_KEY, settings.CASHFREE_ENV)
         import requests
         headers = {
             "x-client-id": settings.CASHFREE_APP_ID,
