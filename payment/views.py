@@ -8,6 +8,8 @@ from django.conf import settings
 from .models import Payment
 from .serializer import PaymentSerializer
 from rest_framework import viewsets
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 class CreatePaymentView(APIView):
@@ -59,7 +61,7 @@ class CreatePaymentView(APIView):
             'payment_link': result.get('payment_link'),
         }, status=status.HTTP_201_CREATED)
     
-
+@method_decorator(csrf_exempt, name='dispatch')
 class CashfreeWebhookView(APIView):
     def post(self, request):
         order_id = request.data.get('order_id')
