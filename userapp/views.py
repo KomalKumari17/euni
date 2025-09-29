@@ -114,3 +114,23 @@ class LogoutView(APIView):
             return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class BookingViewSet(viewsets.ModelViewSet):
+    queryset = Booking.objects.all()
+    serializer_class = BookingSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(customer=self.request.user, status='confirmed')
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_superuser or getattr(user, 'role', None) == 'admin':
+            return Booking.objects.all()
+        elif getattr(user, 'role', None) == 'professional':
+            return Booking.objects.filter(professional=user)
+        elif getattr(user, 'role', None) == 'assistant':
+            return Booking.objects.filter(assistant=user)
+        else:
+            return Booking.objects.filter(customer=user)

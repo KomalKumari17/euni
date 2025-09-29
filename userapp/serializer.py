@@ -84,3 +84,41 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'vendor', 'customer', 'rating', 'comment', 'created_at', 'updated_at']
+
+
+class BookingSerializer(serializers.ModelSerializer):
+    customer = serializers.PrimaryKeyRelatedField(queryset=CustomUser.objects.all(), default=serializers.CurrentUserDefault())
+    class Meta:
+        model = Booking
+        fields = '__all__'
+
+    def validate_professional(self, value):
+        if value.role not in ['professional', 'assistant']:
+            raise serializers.ValidationError("Selected professional must have role 'professional' or 'assistant'.")
+        return value
+
+    def validate_customer(self, value):
+        if value.role != 'customer':
+            raise serializers.ValidationError("Customer must have role 'customer'.")
+        return value
+    
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['customer'] = {
+            'id': instance.customer.id,
+            'fname': instance.customer.fname,
+            'lname': instance.customer.lname,
+            'email': instance.customer.email,
+            'phone_number': instance.customer.phone_number,
+            'role': instance.customer.role,
+        }
+        rep['professional'] = {
+            'id': instance.professional.id,
+            'fname': instance.professional.fname,
+            'lname': instance.professional.lname,
+            'email': instance.professional.email,
+            'phone_number': instance.professional.phone_number,
+            'role': instance.professional.role,
+            'department': instance.professional.profile.department.name if hasattr(instance.professional, 'profile') and instance.professional.profile.department else None,
+        }
+        return rep

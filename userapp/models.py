@@ -112,3 +112,25 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.customer.username} for {self.vendor.name}"
+    
+class Booking(models.Model):
+    class BookingStatus(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        CONFIRMED = 'confirmed', 'Confirmed'
+        COMPLETED = 'completed', 'Completed'
+        CANCELLED = 'cancelled', 'Cancelled'
+
+    customer = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role__in': ['customer']}, related_name='bookings')
+    professional = models.ForeignKey(CustomUser, on_delete=models.CASCADE, limit_choices_to={'role__in': ['professional', 'assistant']}, related_name='appointments')
+    booking_date = models.DateField()
+    booking_time = models.TimeField()
+    status = models.CharField(max_length=50, choices=BookingStatus.choices, default=BookingStatus.PENDING)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-id']
+        unique_together = ('customer', 'professional', 'booking_date', 'booking_time')
+
+    def __str__(self):
+        return f"Booking by {self.customer.username} with {self.professional.username} on {self.booking_date} at {self.booking_time}"

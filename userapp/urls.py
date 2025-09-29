@@ -6,6 +6,8 @@ from rest_framework.routers import DefaultRouter
 router = DefaultRouter()
 
 router.register(r'vendors', UserProfileViewSet, basename='vendor')
+router.register(r'bookings', BookingViewSet, basename='booking')
+
 urlpatterns = [
     path("", include(router.urls)),
     path('login/', LoginView.as_view(), name='login'),

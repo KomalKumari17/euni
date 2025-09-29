@@ -63,20 +63,41 @@ class CreatePaymentView(APIView):
     
 @method_decorator(csrf_exempt, name='dispatch')
 class CashfreeWebhookView(APIView):
+    authentication_classes = []
+    permission_classes = []
+
     def post(self, request):
-        order_id = request.data.get('order_id')
-        payment_status = request.data.get('status', 'pending')
-        payment_mode = request.data.get('payment_mode', None)
-        transaction_id = request.data.get('tx_ref')
-        payment = Payment.objects.filter(order_id=order_id).first()
-        if payment:
-            payment.status = payment_status
-            payment.payment_mode = payment_mode
-            payment.transaction_id = transaction_id
-            payment.save()
-            return Response({'message': 'Payment status updated'}, status=status.HTTP_200_OK)
-        return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
-    
+        try:
+            # Log the incoming webhook for debugging
+            print("Cashfree Webhook Received:", request.data)
+            
+            order_id = request.data.get('order_id')
+            payment_status = request.data.get('status', 'pending')
+            payment_mode = request.data.get('payment_mode', None)
+            transaction_id = request.data.get('tx_ref')
+            
+            if not order_id:
+                return Response({'error': 'order_id is required'}, 
+                              status=status.HTTP_400_BAD_REQUEST)
+            
+            payment = Payment.objects.filter(order_id=order_id).first()
+            if payment:
+                payment.status = payment_status
+                payment.payment_mode = payment_mode
+                payment.transaction_id = transaction_id
+                payment.save()
+                
+                # Return success response with exact format Cashfree expects
+                return Response({'message': 'Webhook processed successfully'}, 
+                              status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Payment not found'}, 
+                              status=status.HTTP_404_NOT_FOUND)
+                
+        except Exception as e:
+            print(f"Webhook error: {str(e)}")
+            return Response({'error': 'Internal server error'}, 
+                          status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PaymentViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
