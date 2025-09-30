@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from rest_framework.generics import ListAPIView
+from adminapp.serializer import SubscriptionPlanSerializer, UserSubscriptionSerializer
+from adminapp.models import SubscriptionPlan, UserSubscription
 from django.shortcuts import get_object_or_404  
 
 
@@ -126,3 +128,48 @@ class CountUsersByRoleView(APIView):
             "departments": self.departments_count(),
             "department_stats": department_stats
         })
+    
+class SubscriptionPlanViewSet(viewsets.ModelViewSet):
+    queryset = SubscriptionPlan.objects.all()
+    serializer_class = SubscriptionPlanSerializer
+    permission_classes = [IsAuthenticated]
+    filterset_fields = ['name', 'price']
+    search_fields = ['name', 'price']
+
+    def perform_create(self, serializer):
+        serializer.save()
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "message": "Subscription plan created successfully"
+            }, status=status.HTTP_201_CREATED)
+    
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response({
+            "status": status.HTTP_200_OK,
+            "message": "Subscription plan updated successfully"
+            }, status=status.HTTP_200_OK)
+    
+    def perform_destroy(self, instance):
+        instance.delete()
+        return Response({
+            "status": status.HTTP_200_OK,
+            "message": "Subscription plan deleted successfully"
+            }, status=status.HTTP_200_OK)
+    
+
+class UserSubscriptionViewSet(viewsets.ModelViewSet):
+    queryset = UserSubscription.objects.all()
+    serializer_class = UserSubscriptionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        return Response({
+            "status": status.HTTP_201_CREATED,
+            "message": "Subscription created successfully",
+            "data": UserSubscriptionSerializer(instance).data
+        }, status=status.HTTP_201_CREATED)

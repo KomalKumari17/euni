@@ -10,6 +10,8 @@ router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'departments', DepartmentViewSet, basename='department')
 router.register(r'userprofiles', UserProfileViewSet, basename='userprofile')
+router.register(r'subscription-plans', SubscriptionPlanViewSet, basename='subscriptionplan')
+router.register(r'user-subscriptions', UserSubscriptionViewSet, basename='usersubscription')
 
 urlpatterns = [
     path("", include(router.urls)),

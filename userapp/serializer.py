@@ -1,7 +1,7 @@
 from .models import *
 from rest_framework import serializers
 from random import randint
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.db import transaction
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -31,9 +31,15 @@ class LoginSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
 
     def validate(self, data):
-        user = authenticate(email=data['email'], password=data['password'])
-        if not user:
-            raise serializers.ValidationError("Invalid credentials")
+        User = get_user_model()
+        try:
+            user = User.objects.get(email=data['email'])
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"error": "Invalid credentials"})
+        if not user.check_password(data['password']):
+            raise serializers.ValidationError({"error": "Invalid credentials"})
+        if not user.is_active:
+            raise serializers.ValidationError({"error": "Your account is disabled."})
         return {"user": user}
 
 

@@ -45,16 +45,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
-    def save(self, *args, **kwargs):
-        if self.is_freetrial and self.joined_at:
-            from django.utils import timezone
-            from datetime import timedelta
-            if timezone.now() > self.joined_at + timedelta(days=30):
-                self.is_freetrial = False
-                self.is_active = False
-        super().save(*args, **kwargs)
-
-
     def __str__(self):
         return self.username
     
@@ -134,3 +124,4 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking by {self.customer.username} with {self.professional.username} on {self.booking_date} at {self.booking_time}"
+    

@@ -14,6 +14,8 @@ from pathlib import Path
 from datetime import timedelta
 import os
 from dotenv import load_dotenv
+from celery.schedules import crontab
+
 load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -47,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'userapp',
+    'adminapp',
     'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
@@ -219,3 +222,23 @@ else:
     CASHFREE_APP_ID = os.getenv('CASHFREE_TEST_APP_ID')
     CASHFREE_SECRET_KEY = os.getenv('CASHFREE_TEST_SECRET_KEY')
     
+
+# Celery settings
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'deactivate-expired-subscriptions-daily': {
+        'task': 'adminapp.tasks.deactivate_expired_subscriptions_task',
+        'schedule': crontab(hour=0, minute=0),  # every day at midnight
+    },
+    'deactivate-expired-freetrial-daily': {
+        'task': 'adminapp.tasks.deactivate_expired_freetrial_task',
+        'schedule': crontab(hour=0, minute=0),  # every day at midnight
+    },
+}
