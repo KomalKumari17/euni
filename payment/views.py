@@ -69,9 +69,8 @@ class CashfreeWebhookView(APIView):
     authentication_classes = []
     permission_classes = []
 
-    def post(self, request):
-        # For validation requests from Cashfree, which may not have a full payload
-        # This helps in successfully adding the webhook endpoint.
+    def post(self, request, *args, **kwargs):
+        # Handle the simple TEST payload from Cashfree for validation
         if request.data.get('type') == 'TEST':
             print("Cashfree TEST webhook received successfully.")
             return Response({'message': 'Test webhook received'}, status=status.HTTP_200_OK)
