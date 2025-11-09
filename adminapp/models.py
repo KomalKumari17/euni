@@ -38,8 +38,8 @@ class UserSubscription(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.plan.name} ({self.start_date} to {self.end_date})"
     
-    class Meta:
-        ordering = ['-id']
-        unique_together = ('user', 'plan', 'start_date', 'end_date')
-        verbose_name = 'User Subscription'
-        verbose_name_plural = 'User Subscriptions'
+    # class Meta:
+    #     ordering = ['-id']
+    #     unique_together = ('user', 'plan', 'start_date', 'end_date')
+    #     verbose_name = 'User Subscription'
+    #     verbose_name_plural = 'User Subscriptions'

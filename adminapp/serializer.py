@@ -32,7 +32,7 @@ class UserSubscriptionSerializer(serializers.ModelSerializer):
         else:
             raise serializers.ValidationError("Invalid plan duration.")
         if UserSubscription.objects.filter(
-            user=user, plan=plan, start_date=start_date, end_date=end_date
+            user=user, plan=plan, start_date=start_date, end_date=end_date, is_active=True
         ).exists():
             raise serializers.ValidationError({"error":"Subscription already exists for this user, plan, and date range."})
         validated_data['user'] = user

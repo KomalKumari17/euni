@@ -171,7 +171,7 @@ class SubscriptionWithPaymentCashfreeView(APIView):
                 user=user,
                 order_id=order_id,
                 amount=amount,
-                status=result.get('status', 'pending'),
+                status=result.get('status', 'PENDING'),
                 payment_mode=payment_mode,
                 transaction_id=None,
                 subscription=subscription
@@ -184,3 +184,51 @@ class SubscriptionWithPaymentCashfreeView(APIView):
                 'payment_link': result.get('payment_link'),
                 'message': 'Subscription and payment initiated successfully.'
             }, status=status.HTTP_201_CREATED)
+        
+    
+
+class VerifyPaymentView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        order_id = request.data.get('order_id')
+        if not order_id:
+            return Response({'error': 'order_id is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        payment = Payment.objects.filter(order_id=order_id, user=request.user).first()
+        if not payment:
+            return Response({'error': 'Payment not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        # If payment is already paid, return it
+        if payment.status == 'PAID':
+            # Ensure subscription is active if not already
+            if payment.subscription and not payment.subscription.is_active:
+                payment.subscription.is_active = True
+                payment.subscription.save()
+            serializer = PaymentSerializer(payment)
+            return Response({'status': payment.status, 'payment': serializer.data}, status=status.HTTP_200_OK)
+        
+        # Otherwise, query Cashfree for the latest status
+        env = getattr(settings, "CASHFREE_ENV", "TEST").upper()
+        if env == "PROD":
+            url = f"https://api.cashfree.com/pg/orders/{order_id}"
+        else:
+            url = f"https://sandbox.cashfree.com/pg/orders/{order_id}"
+        headers = {
+            "x-client-id": settings.CASHFREE_APP_ID,
+            "x-client-secret": settings.CASHFREE_SECRET_KEY,
+            "x-api-version": "2022-01-01",
+            "Content-Type": "application/json"
+        }
+        response = requests.get(url, headers=headers)
+        result = response.json()
+        new_status = result.get('order_status', payment.status)
+        if new_status != payment.status:
+            payment.status = new_status
+            payment.save()
+        # If payment is now PAID, activate subscription
+        if payment.status == 'PAID' and payment.subscription and not payment.subscription.is_active:
+            payment.subscription.is_active = True
+            payment.subscription.save()
+        serializer = PaymentSerializer(payment)
+        return Response({'status': payment.status, 'payment': serializer.data}, status=status.HTTP_200_OK)

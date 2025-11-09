@@ -3,17 +3,17 @@ from django.conf import settings
 
 class Payment(models.Model):
     class PaymentStatus(models.TextChoices):
-        PENDING = 'pending', 'Pending'
-        COMPLETED = 'completed', 'Completed'
-        FAILED = 'failed', 'Failed'
-        CANCELLED = 'cancelled', 'Cancelled'
+        PENDING = 'PENDING', 'Pending'
+        FAILED = 'FAILED', 'Failed'
+        CANCELLED = 'CANCELLED', 'Cancelled'
+        PAID = 'PAID', 'Paid'
 
     class PaymentMode(models.TextChoices):
-        ONLINE = 'online', 'Online'
-        UPI = 'upi', 'UPI'
-        CARD = 'card', 'Card'
-        NETBANKING = 'netbanking', 'Netbanking'
-        WALLET = 'wallet', 'Wallet'
+        ONLINE = 'ONLINE', 'Online'
+        UPI = 'UPI', 'UPI'
+        CARD = 'CARD', 'Card'
+        NETBANKING = 'NETBANKING', 'Netbanking'
+        WALLET = 'WALLET', 'Wallet'
 
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payments')
     order_id = models.CharField(max_length=100, unique=True)
